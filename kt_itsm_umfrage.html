@@ -321,12 +321,12 @@
   }
   .scale-btn.selected-7 .score-pill { background: rgba(26, 95, 212, 0.18); }
 
-  .scale-btn.selected-9 {
+  .scale-btn.selected-10 {
     background: rgba(26, 122, 64, 0.1);
     border-color: rgba(26, 122, 64, 0.4);
     color: var(--accent2);
   }
-  .scale-btn.selected-9 .score-pill { background: rgba(26, 122, 64, 0.18); }
+  .scale-btn.selected-10 .score-pill { background: rgba(26, 122, 64, 0.18); }
 
   /* WEIGHT BADGE */
   .weight-badge {
@@ -630,7 +630,7 @@ function exportCSV() {
 
   WANTS.forEach(w => {
     const raw      = state[w.id];
-    const scoreMap = { 0: 'Nicht vorhanden', 4: 'Schwach', 7: 'Okay/gut', 9: 'Sehr stark' };
+    const scoreMap = { 0: 'Nicht vorhanden', 4: 'Schwach', 7: 'Okay/gut', 10: 'Sehr stark' };
     const display  = raw === null ? '' : scoreMap[raw];
     const weighted = raw === null ? '' : raw * w.weight;
     rows.push([
