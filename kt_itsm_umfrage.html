@@ -630,7 +630,7 @@ function exportCSV() {
 
   WANTS.forEach(w => {
     const raw      = state[w.id];
-    const scoreMap = { 0: 'Nicht vorhanden', 4: 'Schwach', 7: 'Okay/gut', 10: 'Sehr stark' };
+    const scoreMap = { 0: 'Nicht vorhanden', 4: 'Ausreichend', 7: 'Gut', 10: 'Außergewöhnlich' };
     const display  = raw === null ? '' : scoreMap[raw];
     const weighted = raw === null ? '' : raw * w.weight;
     rows.push([
