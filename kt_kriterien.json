@@ -13,7 +13,7 @@
     {
       "id": "M3",
       "label": "Etablierter Vendor (kein Start-up, nachweisliche Reputation)",
-      "hint": "Langfristige Bindung – SLAs, Lizenzmodell, Track Record"
+      "hint": "SLA Errecibarkeit, Support verfügbar, Firmengröße > 100 MA, Firmenalter (> 5 Jahre, kein Startup) "
     },
     {
       "id": "M4",
@@ -23,7 +23,7 @@
     {
       "id": "M5",
       "label": "SSO-fähig (Entra ID) mit MFA",
-      "hint": "Technische Anbindung an bestehende Azure AD Infrastruktur"
+      "hint": "Technische Anbindung an bestehende EintraId möglich"
     }
   ],
   "wants": [
@@ -43,7 +43,7 @@
       "id": "W3",
       "label": "KI-Integrationen möglich",
       "weight": 7,
-      "hint": "Ticket-Qualität, Self-Service ohne menschlichen Aufwand"
+      "hint": "Zur Verbesserung der Ticket-Qualität, für Self-Service ohne menschlichen Aufwand"
     },
     {
       "id": "W4",
