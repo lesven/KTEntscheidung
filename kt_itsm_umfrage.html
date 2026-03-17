@@ -8,16 +8,16 @@
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
   :root {
-    --bg: #0f1117;
-    --surface: #181c26;
-    --surface2: #1e2332;
-    --border: #2a3050;
-    --accent: #4f8ef7;
-    --accent2: #7ee8a2;
-    --warn: #f7c94f;
-    --danger: #f7614f;
-    --text: #e8ecf4;
-    --text-dim: #8892aa;
+    --bg: #f0f2f7;
+    --surface: #ffffff;
+    --surface2: #e8ecf5;
+    --border: #b0bcd4;
+    --accent: #1a5fd4;
+    --accent2: #1a7a40;
+    --warn: #8a5e00;
+    --danger: #b52010;
+    --text: #12161f;
+    --text-dim: #3e4a65;
     --mono: 'IBM Plex Mono', monospace;
     --sans: 'IBM Plex Sans', sans-serif;
     --radius: 6px;
@@ -119,21 +119,21 @@
   }
 
   .tag-must {
-    background: rgba(247, 97, 79, 0.15);
+    background: rgba(181, 32, 16, 0.1);
     color: var(--danger);
-    border: 1px solid rgba(247, 97, 79, 0.3);
+    border: 1px solid rgba(181, 32, 16, 0.35);
   }
 
   .tag-want {
-    background: rgba(79, 142, 247, 0.12);
+    background: rgba(26, 95, 212, 0.1);
     color: var(--accent);
-    border: 1px solid rgba(79, 142, 247, 0.25);
+    border: 1px solid rgba(26, 95, 212, 0.35);
   }
 
   .tag-notes {
-    background: rgba(126, 232, 162, 0.1);
+    background: rgba(26, 122, 64, 0.1);
     color: var(--accent2);
-    border: 1px solid rgba(126, 232, 162, 0.25);
+    border: 1px solid rgba(26, 122, 64, 0.3);
   }
 
   .section-title {
@@ -192,7 +192,7 @@
     transition: border-color 0.2s;
   }
 
-  .criterion-card:hover { border-color: #3a4560; }
+  .criterion-card:hover { border-color: #7a8aaa; }
 
   .criterion-card.answered {
     border-left: 3px solid var(--accent2);
@@ -252,16 +252,16 @@
     white-space: nowrap;
   }
 
-  .must-btn:hover { border-color: #3a4560; color: var(--text); }
+  .must-btn:hover { border-color: #7a8aaa; color: var(--text); }
 
   .must-btn.yes.selected {
-    background: rgba(126, 232, 162, 0.15);
+    background: rgba(26, 122, 64, 0.12);
     border-color: var(--accent2);
     color: var(--accent2);
   }
 
   .must-btn.no.selected {
-    background: rgba(247, 97, 79, 0.15);
+    background: rgba(181, 32, 16, 0.1);
     border-color: var(--danger);
     color: var(--danger);
   }
@@ -298,35 +298,35 @@
     margin-bottom: 4px;
   }
 
-  .scale-btn:hover { border-color: #3a4560; color: var(--text); }
+  .scale-btn:hover { border-color: #7a8aaa; color: var(--text); }
 
   .scale-btn.selected-0 {
-    background: rgba(247, 97, 79, 0.1);
-    border-color: rgba(247, 97, 79, 0.4);
+    background: rgba(181, 32, 16, 0.1);
+    border-color: rgba(181, 32, 16, 0.45);
     color: var(--danger);
   }
-  .scale-btn.selected-0 .score-pill { background: rgba(247, 97, 79, 0.2); }
+  .scale-btn.selected-0 .score-pill { background: rgba(181, 32, 16, 0.18); }
 
   .scale-btn.selected-4 {
-    background: rgba(247, 201, 79, 0.1);
-    border-color: rgba(247, 201, 79, 0.4);
+    background: rgba(138, 94, 0, 0.1);
+    border-color: rgba(138, 94, 0, 0.45);
     color: var(--warn);
   }
-  .scale-btn.selected-4 .score-pill { background: rgba(247, 201, 79, 0.2); }
+  .scale-btn.selected-4 .score-pill { background: rgba(138, 94, 0, 0.18); }
 
   .scale-btn.selected-7 {
-    background: rgba(79, 142, 247, 0.1);
-    border-color: rgba(79, 142, 247, 0.4);
+    background: rgba(26, 95, 212, 0.1);
+    border-color: rgba(26, 95, 212, 0.4);
     color: var(--accent);
   }
-  .scale-btn.selected-7 .score-pill { background: rgba(79, 142, 247, 0.2); }
+  .scale-btn.selected-7 .score-pill { background: rgba(26, 95, 212, 0.18); }
 
   .scale-btn.selected-9 {
-    background: rgba(126, 232, 162, 0.1);
-    border-color: rgba(126, 232, 162, 0.4);
+    background: rgba(26, 122, 64, 0.1);
+    border-color: rgba(26, 122, 64, 0.4);
     color: var(--accent2);
   }
-  .scale-btn.selected-9 .score-pill { background: rgba(126, 232, 162, 0.2); }
+  .scale-btn.selected-9 .score-pill { background: rgba(26, 122, 64, 0.18); }
 
   /* WEIGHT BADGE */
   .weight-badge {
@@ -409,7 +409,7 @@
     top: 24px;
     right: 24px;
     background: var(--accent2);
-    color: #0f1117;
+    color: #ffffff;
     font-family: var(--mono);
     font-size: 13px;
     font-weight: 600;
@@ -483,9 +483,9 @@ let WANTS = [];
 
 const SCALE = [
   { label: 'Nicht vorhanden / nicht möglich', value: 0 },
-  { label: 'ausreichend / wenig möglich', value: 4 },
+  { label: 'grade so ausreichend für unsere Zwecke', value: 4 },
   { label: 'Gut, deckt alles ab', value: 7 },
-  { label: 'Außergewöhnlich, richtig stark', value: 9 },
+  { label: 'Außergewöhnlich, richtig stark', value: 10 },
 ];
 
 // State: flat, single product (populated after JSON load)
