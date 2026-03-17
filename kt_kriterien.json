@@ -29,9 +29,9 @@
   "wants": [
     {
       "id": "W1",
-      "label": "EU-Cloud-Betrieb (kein On-Premises)",
+      "label": "EU-Cloud-Betrieb (kein On-Premises) Hosting Angebot",
       "weight": 7,
-      "hint": "Extern gehosted → kein interner Update-Aufwand"
+      "hint": "Extern gehosted → kein interner Update-Aufwand, welchen Eindruck macht das Hosting"
     },
     {
       "id": "W2",
