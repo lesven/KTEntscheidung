@@ -4,6 +4,7 @@ services:
     container_name: kt-umfrage
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8099:80"
     volumes:
       - ./kt_itsm_umfrage.html:/usr/share/nginx/html/index.html:ro
+      - ./kt_kriterien.json:/usr/share/nginx/html/kt_kriterien.json:ro
