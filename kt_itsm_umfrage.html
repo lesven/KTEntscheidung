@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITSM Tool – Kepner-Tregoe Bewertung</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c26;
+    --surface2: #1e2332;
+    --border: #2a3050;
+    --accent: #4f8ef7;
+    --accent2: #7ee8a2;
+    --warn: #f7c94f;
+    --danger: #f7614f;
+    --text: #e8ecf4;
+    --text-dim: #8892aa;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --radius: 6px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .header-badge {
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+
+  .header-text h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .header-text p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-family: var(--mono);
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    background: var(--border);
+    height: 3px;
+    width: 100%;
+  }
+  .progress-bar-fill {
+    background: var(--accent);
+    height: 3px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 0;
+  }
+
+  /* SECTION BLOCKS */
+  .section {
+    margin-bottom: 48px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  .tag-must {
+    background: rgba(247, 97, 79, 0.15);
+    color: var(--danger);
+    border: 1px solid rgba(247, 97, 79, 0.3);
+  }
+
+  .tag-want {
+    background: rgba(79, 142, 247, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(79, 142, 247, 0.25);
+  }
+
+  .tag-notes {
+    background: rgba(126, 232, 162, 0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(126, 232, 162, 0.25);
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .section-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    padding-left: 2px;
+  }
+
+  /* PRODUCT NAME */
+  .product-name-wrap {
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-label {
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .product-name-wrap input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    max-width: 400px;
+  }
+
+  .product-name-wrap input:focus { border-color: var(--accent); }
+
+  /* CRITERION CARDS */
+  .criterion-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .criterion-card:hover { border-color: #3a4560; }
+
+  .criterion-card.answered {
+    border-left: 3px solid var(--accent2);
+  }
+
+  .criterion-card.must-answered-yes { border-left: 3px solid var(--accent2); }
+  .criterion-card.must-answered-no { border-left: 3px solid var(--danger); }
+
+  .criterion-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .criterion-info { flex: 1; }
+
+  .criterion-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .criterion-label {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .criterion-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* MUST TOGGLE */
+  .must-toggle {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .must-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 16px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .must-btn:hover { border-color: #3a4560; color: var(--text); }
+
+  .must-btn.yes.selected {
+    background: rgba(126, 232, 162, 0.15);
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .must-btn.no.selected {
+    background: rgba(247, 97, 79, 0.15);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  /* WANT SCALE */
+  .want-scale {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .scale-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 9px 8px;
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.3;
+  }
+
+  .scale-btn .score-pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--border);
+    border-radius: 2px;
+    padding: 1px 6px;
+    margin-bottom: 4px;
+  }
+
+  .scale-btn:hover { border-color: #3a4560; color: var(--text); }
+
+  .scale-btn.selected-0 {
+    background: rgba(247, 97, 79, 0.1);
+    border-color: rgba(247, 97, 79, 0.4);
+    color: var(--danger);
+  }
+  .scale-btn.selected-0 .score-pill { background: rgba(247, 97, 79, 0.2); }
+
+  .scale-btn.selected-4 {
+    background: rgba(247, 201, 79, 0.1);
+    border-color: rgba(247, 201, 79, 0.4);
+    color: var(--warn);
+  }
+  .scale-btn.selected-4 .score-pill { background: rgba(247, 201, 79, 0.2); }
+
+  .scale-btn.selected-7 {
+    background: rgba(79, 142, 247, 0.1);
+    border-color: rgba(79, 142, 247, 0.4);
+    color: var(--accent);
+  }
+  .scale-btn.selected-7 .score-pill { background: rgba(79, 142, 247, 0.2); }
+
+  .scale-btn.selected-9 {
+    background: rgba(126, 232, 162, 0.1);
+    border-color: rgba(126, 232, 162, 0.4);
+    color: var(--accent2);
+  }
+  .scale-btn.selected-9 .score-pill { background: rgba(126, 232, 162, 0.2); }
+
+  /* WEIGHT BADGE */
+  .weight-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 8px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  /* TEXTAREA */
+  textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    outline: none;
+    padding: 14px 16px;
+    resize: vertical;
+    transition: border-color 0.2s;
+    width: 100%;
+    min-height: 120px;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+
+  /* SUBMIT */
+  .submit-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    z-index: 200;
+  }
+
+  .submit-status {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .submit-status span { color: var(--accent); font-weight: 600; }
+
+  .btn-export {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 12px 28px;
+    transition: all 0.15s;
+  }
+
+  .btn-export:hover { background: #6ba3ff; transform: translateY(-1px); }
+  .btn-export:active { transform: translateY(0); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: var(--accent2);
+    color: #0f1117;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 600px) {
+    header { padding: 20px; flex-direction: column; }
+    main { padding: 24px 16px 0; }
+    .meta-section { grid-template-columns: 1fr; padding: 20px; }
+    .want-scale { grid-template-columns: 1fr 1fr; }
+    .submit-bar { padding: 12px 16px; flex-direction: column; gap: 10px; }
+    .alt-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+    .must-toggle { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+
+<header>
+  <div class="header-badge">K·T Analyse</div>
+  <div class="header-text">
+    <h1>ITSM Tool – Entscheidungsbewertung</h1>
+    <p>Kepner-Tregoe · Alternativenvergleich · MUST &amp; WANT</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- PRODUCT NAME -->
+  <div class="product-name-wrap">
+    <label class="product-label">Bewertetes Produkt</label>
+    <input type="text" id="productName" placeholder="z. B. Zammad, ServiceNow, TOPdesk …" oninput="onProductNameChange(this.value)">
+  </div>
+
+  <div id="formBody"></div>
+
+  <!-- NOTES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-tag tag-notes">Freitext</span>
+      <span class="section-title">Sonstige Anmerkungen</span>
+    </div>
+    <p class="section-desc">Rahmenbedingungen, Vorannahmen, Bedenken oder sonstige Eindrücke.</p>
+    <textarea id="notes_global" placeholder="Freitext …"></textarea>
+  </div>
+
+</main>
+
+<div class="submit-bar">
+  <div class="submit-status">Beantwortet: <span id="answeredCount">0</span> / <span id="totalCount">0</span> Felder</div>
+  <button class="btn-export" onclick="exportCSV()">↓ CSV exportieren</button>
+</div>
+
+<div class="toast" id="toast">CSV gespeichert ✓</div>
+
+<script>
+// Kriterien werden aus kt_kriterien.json geladen (muss im gleichen Ordner liegen)
+let MUSTS = [];
+let WANTS = [];
+
+const SCALE = [
+  { label: 'Nicht vorhanden / nicht möglich', value: 0 },
+  { label: 'Schwach / wenig möglich', value: 4 },
+  { label: 'Okay, gut', value: 7 },
+  { label: 'Richtig stark / sehr überzeugend', value: 9 },
+];
+
+// State: flat, single product (populated after JSON load)
+const state = {};
+
+function buildForm() {
+  const body = document.getElementById('formBody');
+  body.innerHTML = '';
+
+  // MUST section
+  const mustSection = document.createElement('div');
+  mustSection.className = 'section';
+  mustSection.innerHTML = `
+    <div class="section-header">
+      <span class="section-tag tag-must">MUST</span>
+      <span class="section-title">K.O.-Kriterien</span>
+    </div>
+    <p class="section-desc">Nicht verhandelbar. Wird ein Kriterium nicht erfüllt, scheidet die Alternative sofort aus.</p>
+  `;
+
+  MUSTS.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'criterion-card';
+    card.id = `card_${m.id}`;
+    const val = state[m.id];
+    if (val === 'yes') card.classList.add('must-answered-yes');
+    if (val === 'no') card.classList.add('must-answered-no');
+
+    card.innerHTML = `
+      <div class="criterion-top">
+        <div class="criterion-info">
+          <div class="criterion-num">${m.id}</div>
+          <div class="criterion-label">${m.label}</div>
+          <div class="criterion-meta">${m.hint}</div>
+        </div>
+        <div class="must-toggle">
+          <button class="must-btn yes ${val === 'yes' ? 'selected' : ''}"
+            onclick="setMust('${m.id}','yes')">✓ Erfüllt</button>
+          <button class="must-btn no ${val === 'no' ? 'selected' : ''}"
+            onclick="setMust('${m.id}','no')">✗ Nicht erfüllt</button>
+        </div>
+      </div>
+    `;
+    mustSection.appendChild(card);
+  });
+
+  body.appendChild(mustSection);
+
+  // WANT section
+  const wantSection = document.createElement('div');
+  wantSection.className = 'section';
+  wantSection.innerHTML = `
+    <div class="section-header">
+      <span class="section-tag tag-want">WANT</span>
+      <span class="section-title">Wunschkriterien</span>
+    </div>
+    <p class="section-desc">Wünschenswerte Eigenschaften. Gewichtung (1–10) stammt aus dem Vorab-Fragebogen.</p>
+  `;
+
+  WANTS.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'criterion-card';
+    card.id = `card_${w.id}`;
+    const val = state[w.id];
+    if (val !== null) card.classList.add('answered');
+
+    const scaleHTML = SCALE.map(s => `
+      <button class="scale-btn ${val === s.value ? 'selected-' + s.value : ''}"
+        onclick="setWant('${w.id}',${s.value})">
+        <div class="score-pill">${s.value}</div><br>${s.label}
+      </button>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="criterion-top">
+        <div class="criterion-info">
+          <div class="criterion-num">${w.id}</div>
+          <div class="criterion-label">${w.label}</div>
+          <div class="criterion-meta">${w.hint}</div>
+        </div>
+        <div class="weight-badge">Gewicht: ${w.weight}</div>
+      </div>
+      <div class="want-scale">${scaleHTML}</div>
+    `;
+    wantSection.appendChild(card);
+  });
+
+  body.appendChild(wantSection);
+  updateStatus();
+}
+
+function setMust(id, val) {
+  state[id] = val;
+  buildForm();
+}
+
+function setWant(id, val) {
+  state[id] = val;
+  buildForm();
+}
+
+function onProductNameChange() {
+  // nothing to rebuild, just keep input live
+}
+
+function updateStatus() {
+  let answered = 0;
+  let total = 0;
+  MUSTS.forEach(m => { total++; if (state[m.id] !== null) answered++; });
+  WANTS.forEach(w => { total++; if (state[w.id] !== null) answered++; });
+  document.getElementById('answeredCount').textContent = answered;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('progressBar').style.width = Math.round(answered / total * 100) + '%';
+}
+
+// CSV Export
+function exportCSV() {
+  const date    = new Date().toISOString().split('T')[0];
+  const product = document.getElementById('productName').value.trim() || 'unbekannt';
+  const notes   = document.getElementById('notes_global').value.replace(/\n/g, ' ').replace(/"/g, '""');
+
+  const rows = [];
+
+  rows.push([
+    'Datum', 'Alternative',
+    'Typ', 'ID', 'Kriterium', 'Gewicht',
+    'Rohwert', 'Bewertung',
+    'Gewichteter Wert',
+    'Anmerkungen'
+  ].map(c => `"${c}"`).join(','));
+
+  MUSTS.forEach(m => {
+    const raw     = state[m.id];
+    const display = raw === null ? '' : raw === 'yes' ? 'Erfüllt' : 'Nicht erfüllt';
+    const score   = raw === null ? '' : raw === 'yes' ? 1 : 0;
+    rows.push([
+      date, product,
+      'MUST', m.id, m.label, '–',
+      score, display, score, ''
+    ].map(c => `"${String(c).replace(/"/g, '""')}"`).join(','));
+  });
+
+  WANTS.forEach(w => {
+    const raw      = state[w.id];
+    const scoreMap = { 0: 'Nicht vorhanden', 4: 'Schwach', 7: 'Okay/gut', 9: 'Sehr stark' };
+    const display  = raw === null ? '' : scoreMap[raw];
+    const weighted = raw === null ? '' : raw * w.weight;
+    rows.push([
+      date, product,
+      'WANT', w.id, w.label, w.weight,
+      raw === null ? '' : raw, display, weighted, ''
+    ].map(c => `"${String(c).replace(/"/g, '""')}"`).join(','));
+  });
+
+  rows.push([
+    date, product,
+    'ANMERKUNG', '–', 'Sonstige Anmerkungen', '–',
+    '', '', '', notes
+  ].map(c => `"${String(c).replace(/"/g, '""')}"`).join(','));
+
+  const bom  = '\uFEFF';
+  const blob = new Blob([bom + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `KT_ITSM_${product.replace(/\s+/g,'_')}_${date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// Init – Kriterien aus JSON laden, dann Formular aufbauen
+async function init() {
+  try {
+    const res  = await fetch('kt_kriterien.json');
+    const data = await res.json();
+    MUSTS = data.musts;
+    WANTS = data.wants;
+  } catch (e) {
+    document.getElementById('formBody').innerHTML =
+      '<p style="color:var(--danger);font-family:var(--mono);padding:20px 0">' +
+      '⚠ kt_kriterien.json konnte nicht geladen werden.<br>' +
+      'Stelle sicher, dass beide Dateien im gleichen Ordner liegen und du einen lokalen Webserver verwendest (z. B. <code>npx serve .</code>).' +
+      '</p>';
+    return;
+  }
+  MUSTS.forEach(m => state[m.id] = null);
+  WANTS.forEach(w => state[w.id] = null);
+  buildForm();
+}
+
+init();
+</script>
+</body>
+</html>

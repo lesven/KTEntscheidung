@@ -1,0 +1,97 @@
+{
+  "musts": [
+    {
+      "id": "M1",
+      "label": "DSGVO-konform / Patientendaten-kompatibel",
+      "hint": "Prüfung via AVV + TOMs, kein Non-EU-Hosting"
+    },
+    {
+      "id": "M2",
+      "label": "Budget eingehalten (~30 Seats)",
+      "hint": "Initial ≤ 130k, jährlich < 30k inkl. Lizenz pro Agent"
+    },
+    {
+      "id": "M3",
+      "label": "Etablierter Vendor (kein Start-up, nachweisliche Reputation)",
+      "hint": "Langfristige Bindung – SLAs, Lizenzmodell, Track Record"
+    },
+    {
+      "id": "M4",
+      "label": "Keine aufwendigen Anpassungen notwendig",
+      "hint": "Innerhalb von 4 Wochen nach Projektstart einsatzbereit"
+    },
+    {
+      "id": "M5",
+      "label": "SSO-fähig (Entra ID) mit MFA",
+      "hint": "Technische Anbindung an bestehende Azure AD Infrastruktur"
+    }
+  ],
+  "wants": [
+    {
+      "id": "W1",
+      "label": "EU-Cloud-Betrieb (kein On-Premises)",
+      "weight": 7,
+      "hint": "Extern gehosted → kein interner Update-Aufwand"
+    },
+    {
+      "id": "W2",
+      "label": "Bedienerfreundlich, flottes UI für User + IT",
+      "weight": 8,
+      "hint": "Höhere Akzeptanz, weniger Zuruf-Tickets"
+    },
+    {
+      "id": "W3",
+      "label": "KI-Integrationen möglich",
+      "weight": 7,
+      "hint": "Ticket-Qualität, Self-Service ohne menschlichen Aufwand"
+    },
+    {
+      "id": "W4",
+      "label": "Prozesse individualisierbar / konfigurierbar",
+      "weight": 6,
+      "hint": "Tool an unsere Realität anpassen, nicht umgekehrt"
+    },
+    {
+      "id": "W5",
+      "label": "Reporting & Analyse",
+      "weight": 6,
+      "hint": "Proaktiv wiederkehrende Aufwände/Probleme erkennen"
+    },
+    {
+      "id": "W6",
+      "label": "Für alle Tochterfirmen nutzbar",
+      "weight": 9,
+      "hint": "Jira ablösen – kein Tool-Zoo über Firmen hinweg"
+    },
+    {
+      "id": "W7",
+      "label": "Self-Service / Wissensdatenbank für User",
+      "weight": 6,
+      "hint": "User lösen gängige Probleme selbst"
+    },
+    {
+      "id": "W8",
+      "label": "API-Anbindungen möglich",
+      "weight": 7,
+      "hint": "Eigene Erweiterbarkeit bei Bedarf"
+    },
+    {
+      "id": "W9",
+      "label": "Jira-Import (Alt-Tickets)",
+      "weight": 8,
+      "hint": "Dokumentationsanforderung – historische Tickets migrieren"
+    },
+    {
+      "id": "W10",
+      "label": "SLA-Monitoring",
+      "weight": 8,
+      "hint": "Einhaltung definierter Prozesse messbar machen"
+    },
+    {
+      "id": "W11",
+      "label": "Integration Konzern-Applikationen",
+      "weight": 8,
+      "hint": "Navision, Swyx, CRM, …"
+    }
+  ]
+}

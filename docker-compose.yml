@@ -1,0 +1,9 @@
+services:
+  kt-umfrage:
+    image: nginx:alpine
+    container_name: kt-umfrage
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./kt_itsm_umfrage.html:/usr/share/nginx/html/index.html:ro
