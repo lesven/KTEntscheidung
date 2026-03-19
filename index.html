@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kepner-Tregoe Entscheidungsanalyse</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.7rem;
+      color: #1a365d;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #718096;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      color: #2b6cb0;
+      margin-bottom: 14px;
+      border-bottom: 2px solid #bee3f8;
+      padding-bottom: 6px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #4a5568;
+    }
+
+    input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66,153,225,0.15);
+    }
+
+    textarea { resize: vertical; min-height: 60px; }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .row .flex-grow { flex: 1 1 180px; }
+    .row .weight-col { flex: 0 0 90px; }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.87rem;
+      padding: 8px 14px;
+      font-weight: 600;
+      transition: background 0.18s, transform 0.1s;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-add {
+      background: #ebf8ff;
+      color: #2b6cb0;
+      border: 1px solid #bee3f8;
+      margin-top: 4px;
+    }
+
+    .btn-add:hover { background: #bee3f8; }
+
+    .btn-remove {
+      background: #fff5f5;
+      color: #c53030;
+      border: 1px solid #fed7d7;
+      padding: 6px 10px;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .btn-remove:hover { background: #fed7d7; }
+
+    .btn-calc {
+      background: #2b6cb0;
+      color: #fff;
+      padding: 10px 28px;
+      font-size: 1rem;
+    }
+
+    .btn-calc:hover { background: #2c5282; }
+
+    .btn-reset {
+      background: #e2e8f0;
+      color: #4a5568;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      border: 1px solid #cbd5e0;
+    }
+
+    .btn-reset:hover { background: #cbd5e0; }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    /* Scoring table */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.88rem;
+      min-width: 420px;
+    }
+
+    th {
+      background: #ebf8ff;
+      color: #2b6cb0;
+      padding: 8px 10px;
+      text-align: center;
+      font-weight: 700;
+      border: 1px solid #bee3f8;
+    }
+
+    th.criterion-header { text-align: left; }
+
+    td {
+      padding: 6px 10px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    td.criterion-name { text-align: left; font-weight: 500; }
+
+    td input[type="number"] {
+      width: 60px;
+      padding: 5px 6px;
+      text-align: center;
+    }
+
+    tr:nth-child(even) td { background: #f7fafc; }
+
+    /* Results */
+    .result-table th { background: #f0fff4; color: #276749; border-color: #9ae6b4; }
+    .result-table td { border-color: #c6f6d5; }
+    .result-table tr.winner td { background: #f0fff4; font-weight: 700; color: #22543d; }
+    .result-table tr.eliminated td { background: #fff5f5; color: #9b2c2c; }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .badge-pass { background: #c6f6d5; color: #22543d; }
+    .badge-fail { background: #fed7d7; color: #9b2c2c; }
+    .badge-winner { background: #9ae6b4; color: #1c4532; margin-left: 6px; }
+
+    .info-box {
+      background: #fffaf0;
+      border-left: 4px solid #f6ad55;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #7b341e;
+      margin-bottom: 16px;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.3rem; }
+      .card { padding: 16px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>⚖️ Kepner-Tregoe Entscheidungsanalyse</h1>
+<p class="subtitle">Strukturierte Entscheidungsfindung nach der Kepner-Tregoe-Methode</p>
+
+<!-- 1. Decision Statement -->
+<div class="card">
+  <h2>1. Entscheidungsaussage</h2>
+  <label for="decisionStatement">Was soll entschieden werden?</label>
+  <textarea id="decisionStatement" rows="2" placeholder="z. B. Welches CRM-System soll das Unternehmen einführen?"></textarea>
+</div>
+
+<!-- 2. Alternatives -->
+<div class="card">
+  <h2>2. Alternativen</h2>
+  <div id="alternativesList"></div>
+  <button class="btn-add" onclick="addAlternative()">+ Alternative hinzufügen</button>
+</div>
+
+<!-- 3. MUST Criteria -->
+<div class="card">
+  <h2>3. Muss-Kriterien (MUST)</h2>
+  <div class="info-box">
+    Muss-Kriterien sind absolute Anforderungen. Eine Alternative, die auch nur ein Muss-Kriterium nicht erfüllt, scheidet aus.
+  </div>
+  <div id="mustList"></div>
+  <button class="btn-add" onclick="addMust()">+ Muss-Kriterium hinzufügen</button>
+</div>
+
+<!-- 4. WANT Criteria -->
+<div class="card">
+  <h2>4. Wunsch-Kriterien (WANT)</h2>
+  <div class="info-box">
+    Wunsch-Kriterien werden gewichtet (1–10). Jede verbleibende Alternative wird bewertet (1–10). Punktzahl = Gewicht × Bewertung.
+  </div>
+  <div id="wantList"></div>
+  <button class="btn-add" onclick="addWant()">+ Wunsch-Kriterium hinzufügen</button>
+</div>
+
+<!-- 5. MUST Evaluation (shown after calculate) -->
+<div class="card hidden" id="mustEvalCard">
+  <h2>5. Bewertung Muss-Kriterien</h2>
+  <div class="table-wrap">
+    <table id="mustEvalTable"></table>
+  </div>
+</div>
+
+<!-- 6. WANT Scoring -->
+<div class="card hidden" id="wantScoringCard">
+  <h2>6. Bewertung Wunsch-Kriterien</h2>
+  <div class="table-wrap">
+    <table id="wantScoringTable"></table>
+  </div>
+</div>
+
+<!-- 7. Results -->
+<div class="card hidden" id="resultsCard">
+  <h2>7. Ergebnis</h2>
+  <div class="table-wrap">
+    <table id="resultsTable" class="result-table"></table>
+  </div>
+  <p id="recommendation" style="margin-top:14px; font-weight:700; font-size:1rem; color:#276749;"></p>
+</div>
+
+<!-- Actions -->
+<div class="actions">
+  <button class="btn-calc" onclick="calculate()">🔢 Auswerten</button>
+  <button class="btn-reset" onclick="resetForm()">↺ Zurücksetzen</button>
+</div>
+
+<script>
+  // ── State ───────────────────────────────────────────────────────────────────
+  let alternatives = [];
+  let mustCriteria = [];
+  let wantCriteria = [];
+  let nextAltId = 0;
+  let nextMustId = 0;
+  let nextWantId = 0;
+
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function getVal(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function getNumVal(id, min, max) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    let v = parseInt(el.value, 10);
+    if (isNaN(v)) return null;
+    if (min !== undefined) v = Math.max(min, v);
+    if (max !== undefined) v = Math.min(max, v);
+    return v;
+  }
+
+  // ── Alternatives ────────────────────────────────────────────────────────────
+  function addAlternative(name = '') {
+    const id = nextAltId++;
+    alternatives.push({ id });
+    renderAlternative(id, name);
+  }
+
+  function renderAlternative(id, name = '') {
+    const list = document.getElementById('alternativesList');
+    const div = document.createElement('div');
+    div.className = 'row';
+    div.id = 'alt-row-' + id;
+    div.innerHTML =
+      '<div class="flex-grow">' +
+        '<label>Alternative ' + (alternatives.findIndex(a => a.id === id) + 1) + '</label>' +
+        '<input type="text" id="alt-' + id + '" value="' + esc(name) + '" placeholder="Name der Alternative" />' +
+      '</div>' +
+      '<button class="btn-remove" onclick="removeAlternative(' + id + ')" title="Entfernen">✕</button>';
+    list.appendChild(div);
+  }
+
+  function removeAlternative(id) {
+    alternatives = alternatives.filter(a => a.id !== id);
+    const el = document.getElementById('alt-row-' + id);
+    if (el) el.remove();
+    renumberAlternatives();
+  }
+
+  function renumberAlternatives() {
+    alternatives.forEach((a, i) => {
+      const row = document.getElementById('alt-row-' + a.id);
+      if (row) {
+        const lbl = row.querySelector('label');
+        if (lbl) lbl.textContent = 'Alternative ' + (i + 1);
+      }
+    });
+  }
+
+  // ── MUST Criteria ───────────────────────────────────────────────────────────
+  function addMust(name = '') {
+    const id = nextMustId++;
+    mustCriteria.push({ id });
+    renderMust(id, name);
+  }
+
+  function renderMust(id, name = '') {
+    const list = document.getElementById('mustList');
+    const div = document.createElement('div');
+    div.className = 'row';
+    div.id = 'must-row-' + id;
+    div.innerHTML =
+      '<div class="flex-grow">' +
+        '<label>Muss-Kriterium</label>' +
+        '<input type="text" id="must-' + id + '" value="' + esc(name) + '" placeholder="Beschreibung des Kriteriums" />' +
+      '</div>' +
+      '<button class="btn-remove" onclick="removeMust(' + id + ')" title="Entfernen">✕</button>';
+    list.appendChild(div);
+  }
+
+  function removeMust(id) {
+    mustCriteria = mustCriteria.filter(m => m.id !== id);
+    const el = document.getElementById('must-row-' + id);
+    if (el) el.remove();
+  }
+
+  // ── WANT Criteria ───────────────────────────────────────────────────────────
+  function addWant(name = '', weight = '') {
+    const id = nextWantId++;
+    wantCriteria.push({ id });
+    renderWant(id, name, weight);
+  }
+
+  function renderWant(id, name = '', weight = '') {
+    const list = document.getElementById('wantList');
+    const div = document.createElement('div');
+    div.className = 'row';
+    div.id = 'want-row-' + id;
+    div.innerHTML =
+      '<div class="flex-grow">' +
+        '<label>Wunsch-Kriterium</label>' +
+        '<input type="text" id="want-' + id + '" value="' + esc(name) + '" placeholder="Beschreibung des Kriteriums" />' +
+      '</div>' +
+      '<div class="weight-col">' +
+        '<label>Gewicht (1–10)</label>' +
+        '<input type="number" id="want-w-' + id + '" min="1" max="10" value="' + esc(String(weight)) + '" placeholder="5" />' +
+      '</div>' +
+      '<button class="btn-remove" onclick="removeWant(' + id + ')" title="Entfernen">✕</button>';
+    list.appendChild(div);
+  }
+
+  function removeWant(id) {
+    wantCriteria = wantCriteria.filter(w => w.id !== id);
+    const el = document.getElementById('want-row-' + id);
+    if (el) el.remove();
+  }
+
+  // ── Calculate ───────────────────────────────────────────────────────────────
+  function calculate() {
+    // Collect current values
+    const decision = getVal('decisionStatement');
+    const alts = alternatives.map(a => ({ id: a.id, name: getVal('alt-' + a.id) }))
+                              .filter(a => a.name !== '');
+    const musts = mustCriteria.map(m => ({ id: m.id, name: getVal('must-' + m.id) }))
+                               .filter(m => m.name !== '');
+    const wants = wantCriteria.map(w => {
+      const weight = getNumVal('want-w-' + w.id, 1, 10);
+      return { id: w.id, name: getVal('want-' + w.id), weight: weight || 5 };
+    }).filter(w => w.name !== '');
+
+    if (alts.length === 0) { alert('Bitte mindestens eine Alternative eingeben.'); return; }
+
+    // ── MUST evaluation table ─────────────────────────────────────────────────
+    const mustCard = document.getElementById('mustEvalCard');
+    const mustTable = document.getElementById('mustEvalTable');
+
+    if (musts.length > 0) {
+      let html = '<thead><tr><th class="criterion-header">Muss-Kriterium</th>';
+      alts.forEach(a => { html += '<th>' + esc(a.name) + '</th>'; });
+      html += '</tr></thead><tbody>';
+
+      musts.forEach(m => {
+        html += '<tr><td class="criterion-name">' + esc(m.name) + '</td>';
+        alts.forEach(a => {
+          const savedId = 'must-eval-' + m.id + '-' + a.id;
+          const existing = document.getElementById(savedId);
+          const checked = existing ? existing.value : 'ja';
+          html += '<td><select id="' + savedId + '" style="padding:5px;border-radius:5px;border:1px solid #cbd5e0;">' +
+            '<option value="ja"' + (checked === 'ja' ? ' selected' : '') + '>✔ Ja</option>' +
+            '<option value="nein"' + (checked === 'nein' ? ' selected' : '') + '>✘ Nein</option>' +
+          '</select></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody>';
+      mustTable.innerHTML = html;
+      mustCard.classList.remove('hidden');
+    } else {
+      mustCard.classList.add('hidden');
+    }
+
+    // ── WANT scoring table ────────────────────────────────────────────────────
+    const wantCard = document.getElementById('wantScoringCard');
+    const wantTable = document.getElementById('wantScoringTable');
+
+    if (wants.length > 0) {
+      let html = '<thead><tr><th class="criterion-header">Wunsch-Kriterium</th><th>Gewicht</th>';
+      alts.forEach(a => { html += '<th>' + esc(a.name) + '<br><small style="font-weight:400">(1–10)</small></th>'; });
+      html += '</tr></thead><tbody>';
+
+      wants.forEach(w => {
+        html += '<tr><td class="criterion-name">' + esc(w.name) + '</td><td><strong>' + w.weight + '</strong></td>';
+        alts.forEach(a => {
+          const scoreId = 'want-score-' + w.id + '-' + a.id;
+          const existing = document.getElementById(scoreId);
+          const val = existing ? existing.value : '';
+          html += '<td><input type="number" id="' + scoreId + '" min="1" max="10" value="' + esc(val) + '" placeholder="–" style="width:60px;text-align:center;" /></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody>';
+      wantTable.innerHTML = html;
+      wantCard.classList.remove('hidden');
+    } else {
+      wantCard.classList.add('hidden');
+    }
+
+    // ── Results ───────────────────────────────────────────────────────────────
+    computeResults(alts, musts, wants);
+  }
+
+  function computeResults(alts, musts, wants) {
+    const resultsCard = document.getElementById('resultsCard');
+    const resultsTable = document.getElementById('resultsTable');
+    const recommendation = document.getElementById('recommendation');
+
+    // Determine eliminated alternatives (fail any MUST)
+    const eliminated = new Set();
+    musts.forEach(m => {
+      alts.forEach(a => {
+        const el = document.getElementById('must-eval-' + m.id + '-' + a.id);
+        if (el && el.value === 'nein') eliminated.add(a.id);
+      });
+    });
+
+    // Compute WANT scores
+    const scores = {};
+    alts.forEach(a => {
+      let total = 0;
+      wants.forEach(w => {
+        const el = document.getElementById('want-score-' + w.id + '-' + a.id);
+        const v = el ? parseInt(el.value, 10) : 0;
+        if (!isNaN(v)) total += w.weight * v;
+      });
+      scores[a.id] = total;
+    });
+
+    // Find winner (highest score, not eliminated)
+    let winnerId = null;
+    let maxScore = -1;
+    alts.forEach(a => {
+      if (!eliminated.has(a.id) && scores[a.id] > maxScore) {
+        maxScore = scores[a.id];
+        winnerId = a.id;
+      }
+    });
+
+    let html = '<thead><tr><th class="criterion-header">Alternative</th>';
+    if (musts.length > 0) html += '<th>Muss-Kriterien</th>';
+    if (wants.length > 0) html += '<th>Gesamtpunktzahl</th>';
+    html += '</tr></thead><tbody>';
+
+    alts.forEach(a => {
+      const isElim = eliminated.has(a.id);
+      const isWinner = a.id === winnerId;
+      const rowClass = isElim ? 'eliminated' : (isWinner ? 'winner' : '');
+      html += '<tr class="' + rowClass + '">';
+      html += '<td class="criterion-name">' + esc(a.name);
+      if (isWinner) html += ' <span class="badge badge-winner">🏆 Empfehlung</span>';
+      html += '</td>';
+
+      if (musts.length > 0) {
+        const failCount = musts.filter(m => {
+          const el = document.getElementById('must-eval-' + m.id + '-' + a.id);
+          return el && el.value === 'nein';
+        }).length;
+        if (failCount > 0) {
+          html += '<td><span class="badge badge-fail">✘ Ausgeschieden (' + failCount + ' Kriterium' + (failCount > 1 ? 'en' : '') + ')</span></td>';
+        } else {
+          html += '<td><span class="badge badge-pass">✔ Alle erfüllt</span></td>';
+        }
+      }
+
+      if (wants.length > 0) {
+        html += '<td><strong>' + (isElim ? '–' : scores[a.id]) + '</strong></td>';
+      }
+
+      html += '</tr>';
+    });
+
+    html += '</tbody>';
+    resultsTable.innerHTML = html;
+
+    if (winnerId !== null) {
+      const winner = alts.find(a => a.id === winnerId);
+      recommendation.textContent = '🏆 Empfehlung: ' + winner.name + ' (Gesamtpunktzahl: ' + maxScore + ')';
+    } else if (alts.every(a => eliminated.has(a.id))) {
+      recommendation.textContent = '⚠️ Alle Alternativen wurden durch Muss-Kriterien ausgeschieden. Bitte die Kriterien überprüfen.';
+      recommendation.style.color = '#c53030';
+    } else {
+      recommendation.textContent = '';
+    }
+
+    resultsCard.classList.remove('hidden');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    resultsCard.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' });
+  }
+
+  // ── Reset ───────────────────────────────────────────────────────────────────
+  function resetForm() {
+    if (!confirm('Alle Eingaben löschen?')) return;
+    document.getElementById('decisionStatement').value = '';
+    document.getElementById('alternativesList').innerHTML = '';
+    document.getElementById('mustList').innerHTML = '';
+    document.getElementById('wantList').innerHTML = '';
+    alternatives = []; mustCriteria = []; wantCriteria = [];
+    nextAltId = 0; nextMustId = 0; nextWantId = 0;
+    ['mustEvalCard', 'wantScoringCard', 'resultsCard'].forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById('recommendation').style.color = '#276749';
+    initDefaults();
+  }
+
+  // ── Defaults ─────────────────────────────────────────────────────────────────
+  function initDefaults() {
+    addAlternative();
+    addAlternative();
+    addMust();
+    addWant('', 5);
+  }
+
+  initDefaults();
+</script>
+</body>
+</html>
